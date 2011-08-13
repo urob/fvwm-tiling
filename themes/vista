@@ -1,0 +1,44 @@
+# =============================================================================
+#  	      File: vista
+#       Author: Robert Ulbricht
+#      Created: Mär 21 2009, 18:32:31 
+# 
+#  Description: windows vista theme for fvwm
+#  Last Change: Aug 13 2011, 22:54:18
+# =============================================================================
+
+Exec exec xsetroot -solid "#3b6ea4"
+CleanupColorsets
+
+# used in fvwm built-in windows (eg. geometry feedback win when resizing)
+DefaultColors #000000 #d4d0c8
+
+# Menu Colorset (=0) and active menu item (=1):
+# hi & sh of colorset 0 define border color of menu
+# (computed automatically if undefined)
+Colorset 0 fg black, bg white
+Colorset 1 fg white, VGradient 200 4 #DCDDDF 5 #B5BCC6 15 #7C8BA8 70 #B3BED4 10 #B6B2B3
+
+# Normal (=2) and Highlight (=3) Colorset:
+# fg is color of font in window decor, bg is border of buttons in window decor
+# sh is background of buttons in window decor, hi is background of buttons
+# in window decor which have a mwm hint (eg max buttong when being maximized)
+Colorset 2 fg #d4d0c8, bg black, sh #d4d0c8, hi #999999
+Colorset 3 fg #ffffff, bg black, sh #d4d0c8, hi #999999
+
+# Normal (=4) and Highlight (=5) Border Colorset
+Colorset 4 bg #7C8BA8
+Colorset 5 bg #fcfcfc
+
+# Normal (=6) and Highlight (=7) WindowTitle Colorset
+# only bg is used (as bg of titlebar)
+#Colorset 6 DGradient 256 #74BD74 #3F699B
+Colorset 6 HGradient 1000 4 #DCDDDF 5 #B5BCC6 15 #7C8BA8 70 #B3BED4 10 #B6B2B3
+Colorset 7 HGradient 1000 4 #DCDDDF 5 #B5BCC6 15 #7C8BA8 70 #B3BED4 10 #B6B2B3
+
+# Buttons, IconMan and Pager
+Colorset 8 fg #000000, VGradient 200 4 #DCDDDF 5 #B5BCC6 15 #7C8BA8 70 #B3BED4 10 #B6B2B3
+Colorset 9 fg #000000, VGradient  200 4 #fcfcfc 5 #DCDDDF 15 #B6B2B3 70 #fcfcfc 10 #ffffff
+
+# Balloons and Tips in IconMan and Pager
+Colorset 10 fg black, bg #fcffe2

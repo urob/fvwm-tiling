@@ -1,0 +1,1127 @@
+#------------------------------------------------------------------------------
+#
+#             File: config
+#           Author: Robert Ulbricht
+#          Created: Mar 10 2009, 22:13:18
+#
+#      Description: Best of both worlds - A tiling-wm configuration for fvwm
+#      Last Change: Aug 14 2011, 00:04:43
+#
+#------------------------------------------------------------------------------
+#
+#                    README                                                 {{{1
+#                   --------
+#      States used: State 0: Toggles EdgeScroll (true if EdgeThickness 0), applies
+#                            only to FvwmButtons
+#                   State 1: true if window is master
+#                   State 2: true if window is floating
+#                   State 3: toggles Title/!Title (true if !Title)
+#
+#     Requirements: The use of 'urxvt' is hardcoded as the default shell.
+#                   Sorry! Either install or better change code (using a
+#                   variable). Further the background-console relies on
+#                   'screen'. Finally, 'stalonetray' is used as tray and
+#                   'dmenu_path' is used for the program launcher. Install or
+#                   adjust. (A recompiled-version of dmenu to match the
+#                   taskbar-size is included, you may have to compile yourself
+#                   if running on another platform.)
+#
+#      Keybindings: Tiling-Related:
+#                     Alt+Space:       Switch current page between floating/tiling mode
+#                                      (can also be done using the indicator-button in the
+#                                      right upper corner of the button bar).
+#                     Alt+Shift+Space: Switch current window between floating/tiling 
+#                                      (only works when in tiling mode)
+#                     Ctrl+Alt+Enter:  Make current window master
+#                     Alt+L:           Increase master area
+#                     Alt+H:           Decrease master area
+#
+#                    Selecting windows:
+#                     Alt+K:           Select next window clockwise
+#                     Alt+J:           Select next window counterclockwise
+#                     Alt+Ctrl+K:      Move current window clockwise
+#                     Alt+Ctrl+J:      Move current window counterclockwise
+#                     Alt+Tab:         Cycle through comple window list (including minimized
+#                                      and other pages)
+#
+#                    Navigating workspaces:
+#                     Alt-Right:       Go to right page (alternative binding: Alt+])
+#                     Alt-Left:        Go to left page (alternative binding: Alt+[)
+#                     Alt-Ctrl-Right:  Go to right page and take focused windows with you
+#                     Alt-Ctrl-Left:   Go to left page and take focused windows with you
+#                     Alt-Down:        Go to next (secondary) desk
+#                     Alt-Up:          Go to previous (primary) desk
+#                     Alt-Escape:      Go to last page
+#
+#                    Window operations:
+#                     Alt+M:           Maximize and set floating
+#                     Alt+T:           Titlebar on/off
+#                     Alt+S:           Toggle Sticky
+#                     Alt+X:           Minimize (retrieve using the taskbar or alt+tab)
+#                     Alt+Shift+C:     Close (alternative shortcut Alt+F4)
+#                     Alt+LeftClick:   Move window and set to floating
+#                     Alt+RightClick:  Resize window and set to floating
+#
+#                    Other:
+#                     Alt+P:           Execute command
+#                     Alt+Grave:       Toggle Background console
+#                     Middle-Click root window/titlebar: Toggle Edgescrolling
+#
+#                    Applications:
+#                     customize in the keybinding section
+#
+#   For more information see the README file.
+#
+#------------------------------------------------------------------------------
+
+#
+#          Global {{{1
+#
+
+# Select a color theme
+#read themes/zenburn
+#read themes/windows2
+#read themes/vista
+read themes/e16
+
+# Define height of FvwmButtons ("taskbar") and workspace area.
+# ----------------------------------
+# If changing the height of the taskbar you may also want to edit the file dmenu_launch
+# to adjust the height of the program launcher (+5 matches 18, +6 matches 17, etc).
+# ----------------------------------
+SetEnv FVWM_TB_HEIGHT 18
+EwmhBaseStruts 0 0 $[FVWM_TB_HEIGHT] 0
+
+# Define default width of master area (in percent of screen)
+SetEnv FVWM_MASTER_WIDTH 50
+Piperead 'echo SetEnv FVWM_MASTER_PIXWIDTH $(( $[FVWM_MASTER_WIDTH]*$[vp.width]/100 ))'
+
+# Define pages which start in tiling mode per default
+# ----------------------------------
+# Usage: SetEnv FVWM_TILING_$[Desk.n]-$[Page.nx]-$[Page.ny] Bool
+# (Repeat for each page that is to start in tiling mode)
+# ----------------------------------
+SetEnv FVWM_TILING_0-0-0 1
+
+DeskTopSize 2x1
+EdgeScroll 100 100
+EdgeThickness 0                # Do not change, to enable uncomment LockScreen in StartFunction
+ClickTime 350
+
+OpaqueMoveSize 100
+ColormapFocus FollowsFocus 
+Emulate Mwm
+
+BugOpts FlickeringMoveWorkaround True
+#EwmhNumberOfDesktops 1 1       # To fix bug when running under KDE
+
+#
+#           Startup {{{1
+#
+
+ImagePath $FVWM_USERDIR/icons/
+
+DestroyFunc StartFunction
+AddToFunc StartFunction
++ I Module FvwmButtons -g $[vp.width]x$[FVWM_TB_HEIGHT]+0+0
++ I Module FvwmCommandS
++ I Schedule 500 Module FvwmEvent
++ I exec exec xset s off
++ I exec exec xset b off
++ I exec exec urxvtd -q -f -o
+#+ I Schedule 500 LockScreen   # uncomment to start with edgescrolling enabled
+#+ I Module FvwmBacker
+#+ I Module FvwmAnimate
+#+ I Module FvwmPager *
+
+Schedule Periodic 2000 UpdateTextfield
+
+DestroyFunc UpdateTextfield
+AddToFunc UpdateTextfield
++ I PipeRead 'echo SendToModule FvwmButtons ChangeButton Textfield Title \
+    \\"`date +"%b %-d, %-H:%M"`\\"'
+### Adjust "text.width" below in section Modules when using one of the two below:
+#    \\"`sh $FVWM_USERDIR/bin/battery-check.sh`, `date +"%-H:%M"`\\"'
+#    \\"`sh $FVWM_USERDIR/bin/battery-check.sh` \\| `date +"%b %-d, %-H:%M"`\\"'
+
+# 
+#          Styles {{{1
+#
+
+#----- Menu Style {{{2
+
+#----- Menu Colorset: hi & sh define border color
+
+MenuStyle * Font "xft:Verdana:pixelsize=11"
+MenuStyle * ItemFormat "%1.15|%3.2i%2.5l%.5l%.5r%7.3>%4.1|"
+MenuStyle * MenuColorset 0, ActiveColorset 1, SeparatorsLong
+MenuStyle * BorderWidth 1, !Animation, Hilight3DOff
+MenuStyle * ActiveFore, HilightBack, TrianglesSolid, TrianglesUseFore
+MenuStyle * PopupOffset -5 100, PopUpImmediately, PopDownDelayed, PopDownDelay 100
+MenuStyle * TitleWarpOff, VerticalItemSpacing 2 4, VerticalTitleSpacing 2 4, !AutomaticHotkeys
+
+
+#----- Default Window Style {{{2
+
+Style * Colorset 2, HilightColorset 3
+Style * BorderWidth 1, !Handles, BorderColorset 4, HilightBorderColorset 5
+
+# Font used in the window title
+Style * Font "xft:Verdana:pixelsize=11:bold"
+Style * UseDecor Default, MWMDecor
+Style * MwmButtons, MwmFunctions, HintOverride
+
+Style * SloppyFocus, FPClickRaisesFocused, FPGrabFocus, FPReleaseFocus
+Style * FPSortWindowlistByFocus
+Style * MinOverlapPercentPlacement, NoPPosition
+
+Style * ResizeOpaque, !AllowMaximizeFixedSize
+Style * SnapAttraction 10 Screen
+Style * WindowShadeSteps 64, WindowShadeShrinks
+#Style * IndexedWindowName, IndexedIconName
+Style * NoIcon
+
+
+
+#----- DefaultDecor {{{2
+
+DestroyDecor Default
+AddToDecor Default
++ TitleStyle LeftJustified Height 19
++ TitleStyle Active (Colorset 7 -- Flat) Inactive (Colorset 6 -- Flat) \
+    ToggledActive (Colorset 7 -- Flat) ToggledInactive (Colorset 6 -- Flat)
++ ButtonStyle All  -- Flat UseTitleStyle
+#+ ButtonStyle All AllActive ( -- Flat UseTitleStyle ) AllInactive ( -- Flat UseTitleStyle )
+#+ ButtonStyle All AllToggled ( -- Flat UseTitleStyle )
++ AddButtonStyle Right AllToggled Vector 26 20x20@4 20x80@1 25x80@1 25x20@1 30x20@1 30x80@1 35x80@1 \
+    35x20@1 40x20@1 40x80@1 45x80@1 45x20@1 50x20@1 50x80@1 55x80@1 55x20@1 60x20@1 60x80@1 65x80@1 \
+    65x20@1 70x20@1 70x80@1 75x80@1 75x20@1 80x20@1 80x80@1
++ AddButtonStyle Right AllUp Vector 26 20x20@4 20x80@0 25x80@0 25x20@0 30x20@0 30x80@0 35x80@0 35x20@0 \
+    40x20@0 40x80@0 45x80@0 45x20@0 50x20@0 50x80@0 55x80@0 55x20@0 60x20@0 60x80@0 65x80@0 65x20@0 \
+    70x20@0 70x80@0 75x80@0 75x20@0 80x20@0 80x80@0
++ AddButtonStyle Right AllDown Vector 26 20x20@4 20x80@1 25x80@1 25x20@1 30x20@1 30x80@1 35x80@1 35x20@1 \
+    40x20@1 40x80@1 45x80@1 45x20@1 50x20@1 50x80@1 55x80@1 55x20@1 60x20@1 60x80@1 65x80@1 65x20@1 70x20@1 \
+    70x80@1 75x80@1 75x20@1 80x20@1 80x80@1
++ AddButtonStyle Right Vector 5 20x20@4 80x20@2 80x80@2 20x80@2 20x20@2
+#+ AddButtonStyle  1 AllActive Vector 4 49x49@4 49x51@2 51x51@2 51x49@2
+# Just destroy the default button and use MiniIcon:
++ AddButtonStyle  1 Vector 4 49x49@4 49x51@4 51x51@4 51x49@4
++ AddButtonStyle  1 MiniIcon
++ AddButtonStyle  2 AllActive Vector 4 40x40@4 60x60@2 60x40@4 40x60@2
++ AddButtonStyle  3 AllActive Vector 9 40x40@4 45x35@2 55x35@2 60x40@2 60x45@2 50x50@2 50x55@2 50x65@4 50x65@2
++ AddButtonStyle  4 AllActive Vector 7 40x40@4 40x60@2 60x60@2 60x40@2 40x40@2 40x45@2 60x45@2
++ AddButtonStyle  6 AllActive Vector 5 40x60@4 60x60@2 60x55@2 40x55@2 40x60@2
++ AddButtonStyle  8 AllActive Vector 5 40x40@4 60x40@2 60x45@2 40x45@2 40x40@2
++ ButtonStyle 1 - MwmDecorMenu
++ ButtonStyle 2 - Clear
++ ButtonStyle 3 - Clear
++ ButtonStyle 4 - MwmDecorMax
++ ButtonStyle 6 - MwmDecorMin
++ ButtonStyle 8 - MwmDecorShade
++ BorderStyle -- HiddenHandles NoInset Raised
+
+ #----- Application Specific Styles {{{2
+
+### Fvwm*
+Style "Fvwm*"       !Title, State 3, CirculateSkip, WindowListSkip
+Style "FvwmButtons" Sticky , !Borders, !Handles, NeverFocus, CirculateHit \
+                    FixedSize, FixedPosition, !Iconifiable, Layer 0 2, State 2, State 0
+Style "FvwmPager"   Sticky,  !Borders, !Handles, NeverFocus, \
+                    FixedSize, FixedPosition, !Iconifiable, Layer 0 2, State 2
+Style "FvwmConsole" CirculateHit, WindowListHit, Title, State 3 False
+Style "FvwmIdent"   CirculateHit, WindowListHit, Title, State 3 False, State 2
+
+### Custom Apps
+Style "urxvt.notitle"  !Title, State 3
+Style "urxvt.bgc"      !Title, State 3, Sticky
+Style "Navigator"      !Title, State 3, StartsOnPage 1 0, SkipMapping
+Style "opera"          !Title, State 3, StartsOnPage 1 0, SkipMapping
+Style "rdesktop"       !Title, State 3, !Borders, !Handles, State 2
+Style "acroread*"      State 2
+Style "gqview*"        State 2
+Style "rox*"           State 2
+Style "MPlayer"        State 2
+Style "skype"          State 2
+Style "display"        State 2
+Style "command"        State 2
+Style "dialog"         State 2
+Style "Gimp"           State 2
+Style "*Picard"        State 2
+Style "*easytag*"      State 2
+
+#---------- Icons {{{3
+
+Style "*"             MiniIcon application.png
+Style "XTerm"         MiniIcon terminal.png
+Style "urxvt*"        MiniIcon mini.bx2.xpm
+Style "*alpine"       MiniIcon mutt.mini.xpm
+Style "*bgc"          MiniIcon mutt.mini.xpm
+Style "Gvim"          MiniIcon vim-16.xpm
+Style "MPlayer"       MiniIcon mplayer_.xpm
+Style "Rox*"          MiniIcon folder.png, EWMHMiniIconOverride
+Style "Iceweasel"     MiniIcon firefox_.png, EWMHMiniIconOverride
+Style "opera"         MiniIcon opera_14x14.png
+
+#
+#          Menus {{{1
+#
+
+#----- Main Menu {{{2
+
+DestroyMenu Main-Menu
+AddToMenu Main-Menu
++ "Root Menu"			Title
+#+ ""				Nop
++ "Home"	       	Exec exec rox
++ "Media"	       	Exec exec rox /media/
++ ""				Nop
++ "Places"      	Popup Places-Menu
++ "Applications"	Popup App-Menu
++ "Debian Menu"		Popup /Debian
++ "Fvwm Tools"		Popup Tool-Menu
++ "Window Ops"      Popup Window-Ops
++ ""		   		Nop
++ "Exit"  			Popup Quit-Verify
+
+
+#----- Places {{{2
+
+DestroyMenu Places-Menu
+AddToMenu Places-Menu
++ "Places"			Title
++ "Home"	       	Exec exec rox ~
++ "Media"	       	Exec exec rox /media
++ "Musik"	       	Exec exec rox ~/Musik
++ ""		   		Nop
++ "eDrive"	       	Exec exec rox /media/edrive
++ "sDrive"	       	Exec exec rox /media/sdrive
++ "usb-Drive"	   	Exec exec rox /media/sda1
++ "CD-Laufwerk"	   	Exec exec rox /media/cdrom
++ ""		   		Nop
++ "tmp"	           	Exec exec rox /tmp
+
+
+#----- Debian Menu {{{2
+
+# Read in system and user menu definitions.
+DestroyMenu /Debian
+AddToMenu /Debian
+Read /etc/X11/fvwm/main-menu-pre.hook Quiet
+Read main-menu-pre.hook Quiet
+
+# Read the auto-generated menus
+Read /etc/X11/fvwm/menudefs.hook Quiet
+Read menudefs.hook Quiet
+
+# Add in user additions
+Read /etc/X11/fvwm/main-menu.hook Quiet
+Read main-menu.hook Quiet
+
+
+#----- Window Ops {{{2
+
+DestroyMenu Window-Ops
+AddToMenu Window-Ops 
+#+ "Window Ops" Title
++ "Move"                        Warp-and-Move
++ "Size"                        Warp-and-Resize
++ "Shade"                       WindowShadeFunc
++ "Minimize"                    Iconify
++ "Maximize"                    Maximize-and-SetFloating 100 100
++ "Advanced"                    Popup Window-Ops-Advanced
++ "" 	            	        Nop
++ "Quit"                        Close
+
+DestroyMenu Window-Ops-Advanced
+AddToMenu Window-Ops-Advanced
++ "Identify"			        Module FvwmIdent
++ "No Title"   	            	RemoveTitle
++ "Layer Up"                    Layer +2 0
++ "Layer Down"                  Layer -2 0
++ "Make Sticky"                 Stick        
++ ""                            Nop
++ "Maximize vertical"           Maximize-and-SetFloating 0 100
++ "Maximize horizontal"	        Maximize-and-SetFloating 100 0
++ "Maximize to screen"          Maximize-and-SetFloating 100 100
++ ""                            Nop
++ "Kill"                        Destroy
+
+
+#----- App  menu {{{2
+
+DestroyMenu App-Menu
+AddToMenu App-Menu
++ "Applications"	Title
++ "XTerm (login)"	Exec exec xterm 
++ "Virtual Box"		Exec exec VirtualBox
++ "Xine"	    	Exec exec xine dvd:/ -f
++ "Zattoo"  		Exec exec zattoo_player
+#+ "Firefox"			Exec exec mozilla-firefox
+#+ "Amarok"			Exec exec amarok
++ ""				Nop
++ "Office"	        Popup App-Menu-Office
++ "System"	    	Popup App-Menu-Sys
++ "Multimedia"		Popup App-Menu-Multi
++ "Science"	        Popup App-Menu-Science
+
+DestroyMenu App-Menu-Sys
+AddToMenu App-Menu-Sys
++ "URxvt"			Exec exec urxvtcd
++ "XTerm (login)"	Exec exec xterm 
++ ""				    Nop
++ "Umount /dev/sd*"		Exec exec sudo /bin/umount /dev/sd*
+
+DestroyMenu App-Menu-Multi
+AddToMenu App-Menu-Multi
++ "Amarok"			Exec exec amarok
++ "Zattoo"  		Exec exec zattoo_player
++ "Xine"	    	Exec exec xine dvd:/ -f
++ "Picard"      	Exec exec picard
++ "Easytag"      	Exec exec easytag
++ ""				Nop
++ "KStars"			Exec exec kstars
++ "Skype"			Exec exec skype
++ "Gaim"			Exec exec gaim
+
+DestroyMenu App-Menu-Science
+AddToMenu App-Menu-Science
++ "Stata 10"		Exec exec xstata-se
+#+ "Mathematica"		Exec exec env XLIB_SKIP_ARGB_VISUALS=1 Mathematica
++ "Mathematica"		Exec exec mathematica -defaultvisual
++ "TeX Doc"			Exec exec texdoctk
++ "Jabref"			Exec exec jabref
+
+DestroyMenu App-Menu-Office
+AddToMenu App-Menu-Office
++ "Firefox"			Exec exec mozilla-firefox
++ "Virtual Box"		Exec exec VirtualBox
++ ""				Nop
++ "Abiword"			Exec exec abiword
++ "Gnumeric"		Exec exec gnumeric
++ "Ding Dictionary"	Exec exec ding -m
++ "BC Calculator"	Exec exec urxvtcd -geometry 65x18 -e bc -q -l .bcrc
+
+
+
+#----- Tool menu {{{2 
+
+DestroyMenu Tool-Menu
+AddToMenu Tool-Menu
++ "Fvwm Tools"			Title
++ "Fvwm Console"        Module FvwmConsole -terminal urxvt -g 80x22 -fg black -bg white
++ "Fvwm Identify"       NoWindow Module FvwmIdent
++ "Pager Desk 1"		Module FvwmPager 0 0
++ "Pager Desk 2"		Module FvwmPager 1 1
++ "Pager All"		    Module FvwmPager 0 1
++ ""				    Nop
++ "Move to Desk 1"      All (CurrentScreen, CurrentDesk, !FvwmPager) MoveToDesk 0 0
++ "Move to Desk 2"      All (CurrentScreen, CurrentDesk, !FvwmPager) MoveToDesk 0 1
++ "Show Desktop"		All (AcceptsFocus, CurrentPage, !Iconic, !Shaded) Iconify on
++ "Refresh Desktop"	    All (CurrentPage, !FvwmButtons, !FvwmPager, !FvwmIconMan, !Iconic) PlaceAgain Anim
++ ""				    Nop
+#+ "Desktop Background"	Popup Background-Menu
++ "Fvwm Themes"     	Popup Themes-Menu
+
+
+DestroyMenu Background-Menu
+AddToMenu Background-Menu
++ "e16 Blue"	        Exec exec xsetroot -solid "#ABB0B7"
++ "e16 Green"	        Exec exec xsetroot -solid "#718671"
++ "Windows Classic"	    Exec exec xsetroot -solid "#3A6EA5"
++ "Black"       	    Exec exec xsetroot -solid "#000000"
++ "White"       	    Exec exec xsetroot -solid "#ffffff"
++ ""				    Nop
++ "Background Changer"  FvwmBacker
+
+DestroyMenu Themes-Menu
+AddToMenu Themes-Menu
++ "Zenburn"	            read themes/zenburn
++ "E16"	                read themes/e16
++ "Windows light"	    read themes/windows
++ "Windows blue"	    read themes/windows2
+
+#+ "Move to Screen"       All (CurrentDesk) MoveToScreen
+#+ "Cascade "			FvwmRearrange -cascade -incx 15p -incy 5p 
+#+ "Expose"	    		FvwmRearrange -tile -h 0 0 20 100 -nostretch
+#+ "Rearrange Icons"		All (Iconic) PlaceAgain Icon
+#+ "Identify"	    	Module FvwmIdent
+#+ "Clean Desktop"		Maintenance
+
+
+#----- Quit- and Halt-Verify menu {{{2 
+
+DestroyMenu Quit-Verify
+AddToMenu Quit-Verify 
++  "Exit"                   Title
+#+ "Cancel"		            Cancel
++ "Exit Fvwm"               Quit
++ "Restart Fvwm"        	Restart
++ "Turn Off Computer"		Exec exec urxvtcd -e sudo /sbin/halt
+
+
+#----- misc. menu's {{{2 
+
+DestroyMenu sd-menu
+AddToMenu sd-menu
++ "/dev/sdb4"		Exec exec rox-filer /media/sdb4
++ "/dev/sdb3"		Exec exec rox-filer /media/sdb3
++ "/dev/sdb1"		Exec exec rox-filer /media/sdb1
++ "/dev/sda4"		Exec exec rox-filer /media/sda4
++ "/dev/sda3"		Exec exec rox-filer /media/sda3
++ "/dev/sda2"		Exec exec rox-filer /media/sda2
++ "/dev/sda1"		Exec exec rox-filer /media/sda1
+
+DestroyMenu rox-menu
+AddToMenu rox-menu
++ "umount"		Popup Umount-Menu
++ ""			Nop
++ "windows"		Exec exec rox-filer /media/windows
++ "torrent"		Exec exec rox-filer ~/.torrent
++ "root"		Exec exec rox-filer /
++ "tmp"			Exec exec rox-filer /tmp
++ "media"		Exec exec rox-filer /media
++ "floppy"		Exec exec rox-filer /media/floppy
++ "cdrom"		Exec exec rox-filer /media/cdrom0
+
+DestroyMenu Umount-Menu
+AddToMenu Umount-Menu
++ "cdrom"		exec exec umount /media/cdrom
++ "floppy"		exec exec umount /media/floppy
++ "windows"		exec exec urxvtcd -e sudo umount /dev/hda1
++ "sda*"		exec exec urxvtcd -e sudo umount /dev/sda*
++ "sdb*"		exec exec urxvtcd -e sudo umount /dev/sdb*
+
+
+
+#
+#          Bindings {{{1
+#
+
+#----- Keyboard {{{2 
+
+Key J      A    M    PrevWindow 
+Key K      A    M    NextWindow 
+Key J      A    CM   SwapWindowsDir SouthEast SouthWest 
+Key K      A    CM   SwapWindowsDir NorthEast NorthWest 
+Key H      A    M    DecreaseMasterWidth 
+Key L      A    M    IncreaseMasterWidth
+
+Key Space  A    M    ToggleTiling 
+Key Space  A    CM   WindowToggleTiling
+Key Space  A    SM   WindowToggleTiling # alternate shortcut when running under vmware
+Key Return A    CM   SetCurrentMaster 
+Key Return A    SM   SetCurrentMaster  # alternate shortcut when running under vmware
+
+Key M      A    M    Maximize-and-SetFloating 100 100
+Key T      A    M    Toggle-Title
+Key S      A    M    Stick
+Key X	   A    M    Iconify true
+Key C	   A    SM   Close
+Key R	   A    SM   RefreshWindow
+
+Key P      A    M    exec exec $FVWM_USERDIR/bin/dmenu_launch -p Execute: \
+                     -nb '$[bg.cs8]' -nf '$[fg.cs8]' -sb '$[bg.cs9]' -sf '$[fg.cs9]' \
+                     -fn "xft:sans:pixelsize=11"
+Key L	   A    SM   exec exec slock
+Key R	   A    CM   Restart
+
+Key Escape A    M    GotoPage prev
+Key grave  A    M    ToggleBGC
+Key dead_grave  A    M    ToggleBGC
+Key Tab    A    M    WindowList (CurrentDesk) Root c c CurrentAtEnd \
+                     CurrentDesk IconifiedAtEnd NoGeometry MaxLabelWidth 40 \
+                     NoCurrentDeskTitle SelectOnRelease Meta_L
+
+Key XF86Back      A    N   GotoPage -1p 0p 
+Key XF86Forward   A    N   GotoPage +1p 0p 
+#Key XF86Back      A    M   SwapWindowsDir SouthEast SouthWest 
+#Key XF86Forward   A    M   SwapWindowsDir NorthEast NorthWest 
+
+
+### Nx1 DeskLayout
+Key Up	             A    M    GotoDesk 0 0
+Key Down             A    M    GotoDesk 0 1
+Key Left             A    M    GotoPage -1p 0p
+Key Right            A    M    GotoPage +1p 0p
+Key Left             A    CM   MoveAndGotoPage -1 0
+Key Right            A    CM   MoveAndGotoPage +1 0
+Key bracketleft      A    M    GotoPage -1p 0p
+Key bracketright     A    M    GotoPage +1p 0p
+Key bracketleft      A    CM   MoveAndGotoPage -1 0
+Key bracketright     A    CM   MoveAndGotoPage +1 0
+
+### NxM DeskLayout
+#Key Up	             A    C    GotoDesk 0 0
+#Key Down            A    C    GotoDesk 0 1
+#Key Left            A    M    GotoPage -1p 0p
+#Key Right           A    M    GotoPage +1p 0p
+#Key Left            A    CM   MoveAndGotoPage -1 0
+#Key Right           A    CM   MoveAndGotoPage +1 0
+#Key Up              A    M    GotoPage 0p -1p
+#Key Down            A    M    GotoPage 0p +1p
+#Key Up              A    CM   MoveAndGotoPage 0 -1
+#Key Down            A    CM   MoveAndGotoPage 0 +1
+#Key bracketleft     A    M    GotoPage -1p 0p
+#Key bracketright    A    M    GotoPage +1p 0p
+#Key bracketleft     A    CM   MoveAndGotoPage -1 0
+#Key bracketright    A    CM   MoveAndGotoPage +1 0
+
+### Applications
+Key Return A    M    exec exec urxvtcd -name urxvt.notitle
+Key E      A    M    exec exec rox-filer
+Key N      A    M    exec exec opera --nomail
+Key M      A    SM   exec exec urxvtcd -name urxvt.notitle -e alpine
+Key K      A    SM   exec exec xkill
+#Key 9     A    CM   exec exec aumix -v -5
+#Key 0     A    CM   exec exec aumix -v +5
+
+### Old, check!
+Key F1     A    M    Menu Main-Menu
+Key F4	   A    M    Close
+#Key F5     A    M    Stick
+Key F6     A    M    WindowShadeFunc
+#Key F7     A    M    Warp-and-Move
+#Key F8     A    M    Warp-and-Resize
+#Key F9	   A    M    All (AcceptsFocus, CurrentPage, !Iconic, !Shaded) \
+#                     Iconify on
+#Key F10    A    M    WindowList (CurrentPage) Root c c CurrentDesk OnlyIcons \
+#                     NoGeometry MaxLabelWidth 40 NoCurrentDeskTitle \
+#                     SelectOnRelease 
+
+#----- Mouse {{{2 
+
+# root
+Mouse 1   R  A  Menu Main-Menu
+Mouse 2   R  A  LockScreen
+Mouse 2   R  M  All (CurrentPage, !Iconic, !FvwmButtons, !FvwmPager, !FvwmIconMan) PlaceAgain Anim
+Mouse 3   R  A  rxvt-under-mouse
+
+# Window (title bar:Buttons)
+Mouse 0 1 A Popup Window-Ops
+Mouse 0 2 A Close
+Mouse 1 4 A Maximize-and-SetFloating 100 100
+Mouse 2 4 A Maximize-and-SetFloating 100 0
+Mouse 3 4 A Maximize-and-SetFloating 0 100
+Mouse 1 6 A Iconify on
+Mouse 3 6 A WindowShadeFunc
+
+# Window (T=title bar, S=side/top/bottom, F=corner, W=Window).
+Mouse 1 T A  LeftClick
+Mouse 2 T A  LockScreen
+Mouse 2 T M  PlaceAgain Anim
+Mouse 3 T A  RightClick
+Mouse 1 W M  LeftClick
+Mouse 2 W M  LockScreen
+Mouse 3 W M  RightClick
+
+
+#
+#          Functions {{{1
+#
+
+#----- Window Control {{{2
+
+DestroyFunc 	LeftClick 
+AddToFunc   	LeftClick
++ M Raise
++ M Move-and-SetFloating
++ C RaiseLower
++ D Raise
++ D Maximize-and-SetFloating 0 100
+
+DestroyFunc		RightClick
+AddToFunc 		RightClick
++ M Raise
++ M Resize-and-SetFloating
++ C WindowshadeFunc
+
+DestroyFunc 	WindowListFunc
+AddToFunc 		WindowListFunc
++ I Iconify false
++ I Windowshade false
++ I Raise
++ I FlipFocus
+#+ I WarpToWindow 50 8p
+
+DestroyFunc 	NextWindow
+AddToFunc 		NextWindow
++ I ScanForWindow NorthEast NorthWest (CurrentPage, !Iconic, AcceptsFocus) FlipFocus
++ I Current Raise
+#+ I Current WarpToWindow 5 5
+
+DestroyFunc 	PrevWindow
+AddToFunc 		PrevWindow
++ I ScanForWindow SouthEast SouthWest (CurrentPage, !Iconic, AcceptsFocus) FlipFocus
++ I Current Raise
+#+ I Current WarpToWindow 5 5
+
+DestroyFunc     Warp-and-Move
+AddToFunc 		Warp-and-Move
++ I WarpToWindow 50 50
++ I Move-and-SetFloating
+
+DestroyFunc     Warp-and-Resize
+AddToFunc 		Warp-and-Resize
++ I WarpToWindow 50 50
++ I Resize-and-SetFloating
+
+DestroyFunc     MoveAndGotoPage
+AddToFunc 		MoveAndGotoPage
++ I MoveToPage $0w $1w
++ I GotoPage $0p $1p
+
+DestroyFunc 	WindowShadeFunc
+AddToFunc 		WindowShadeFunc
++ I Current WindowStyle Title
++ I Current State 3 False
++ I WindowShade
+#+ I All (Shaded, CurrentPage) PlaceAgain
+#+ I PlaceAgain
+
+DestroyFunc 	RemoveTitle
+AddToFunc 		RemoveTitle
++ I Current WindowStyle !Title
+#+ I Current Resize keep w+15p
++ I Current State 3 True
+
+DestroyFunc     Toggle-Title
+AddToFunc       Toggle-Title
++ I Current (State 3) WindowStyle Title
++ I TestRc (Match) Current Resize keep w-19p
++ I Current State 3 Toggle
++ I Current (State 3) WindowStyle !Title
++ I TestRc (Match) Current Resize keep w+19p
+
+DestroyFunc 	LockScreen
+AddToFunc 		LockScreen
++ I Next (FvwmButtons, State 0) EdgeThickness 1
++ I Next (FvwmButtons) State 0
++ I Next (FvwmButtons, State 0) EdgeThickness 0
+
+DestroyFunc     rxvt-under-mouse
+AddToFunc       rxvt-under-mouse
++ I Style "urxvt" PositionPlacement UnderMouse
++ I Exec exec urxvtcd
++ I Wait urxvt
++ I Style "urxvt" MinOverlapPercentPlacement
+
+DestroyFunc 	Maintenance
+AddToFunc 		Maintenance
++ I SendToModule FvwmAnimate pause
++ I All (!Visible, CurrentPage, !Iconic, !Sticky, !Focused) Iconify on
++ I SendToModule FvwmAnimate play
+
+#----- Background Console {{{2
+# requires screen (uses configuration screenrc.bgc) 
+
+DestroyFunc ToggleBGC
+AddToFunc ToggleBGC
++ I None (urxvt.bgc) BGC_Init
+#+ I All (urxvt.bgc, CurrentDesk) BGC_Hide
++ I All (urxvt.bgc, !iconic) BGC_Hide
++ I TestRc (0) BGC_Show
+
+DestroyFunc BGC_Init
+AddToFunc BGC_Init
++ I Exec exec urxvt -geometry 100x62 -name urxvt.bgc -e screen -d -R BGC -c $FVWM_USERDIR/screenrc.bgc
++ I Wait urxvt.bgc
+#+ I All (urxvt.bgc) MoveToDesk 0 666
++ I All (urxvt.bgc) Iconify true
++ I Prev (CurrentPage, !iconic, AcceptsFocus) FlipFocus
+
+DestroyFunc BGC_Show
+AddToFunc BGC_Show
+#+ I All (urxvt.bgc) MoveToDesk 0 $[desk.n]
++ I All (urxvt.bgc) Iconify false
++ I All (urxvt.bgc) Raise 
++ I All (urxvt.bgc) WindowShade false
++ I All (urxvt.bgc) WindowStyle WindowListHit
++ I Next (urxvt.bgc) FlipFocus
+#+ I NewWindow
+
+DestroyFunc BGC_Hide
+AddToFunc BGC_Hide
++ I All (urxvt.bgc) WindowShade true
+#+ I All (urxvt.bgc) MoveToDesk 0 666 
++ I All (urxvt.bgc) Iconify true 
++ I All (urxvt.bgc) WindowStyle WindowListSkip, CirculateHit
++ I None (CurrentPage, Focused) Prev (CurrentPage, !iconic, AcceptsFocus) FlipFocus
+#+ I DestroyWindow
+
+#----- Tiling Functions {{{2
+
+#--------- General / Initialization {{{3
+
+Style * ResizeHintOverride
+
+DestroyModuleConfig FvwmEvent: *
+*FvwmEvent: Cmd
+*FvwmEvent: add_window "NewWindow"
+*FvwmEvent: destroy_window "DestroyWindow"
+*FvwmEvent: deiconify "NewWindow"
+*FvwmEvent: iconify "DestroyWindow"
+#*FvwmEvent: windowshade "DestroyWindow"
+#*FvwmEvent: dewindowshade "NewWindow"
+*FvwmEvent: new_page "NewPageFunc"
+*FvwmEvent: new_desk "NewPageFunc"
+
+### Executed on page/desk change
+DestroyFunc NewPageFunc
+AddToFunc NewPageFunc
++ I None (CurrentPage, Focused) Prev (CurrentPage, !iconic, AcceptsFocus) FlipFocus
++ I FixSticky
++ I SendToModule FvwmButtons ChangeButton Layout Icon floating18.png
++ I Test (!EnvMatch FVWM_TILING_$[desk.n]-$[page.nx]-$[page.ny] 1) Break
++ I SendToModule FvwmButtons ChangeButton Layout Icon tile18.png
++ I None (CurrentPage, !State 1, !State 2, !iconic, AcceptsFocus) Break
++ I Refresh
++ I All (CurrentPage, !iconic, AcceptsFocus, State 1) \
+    Resize frame $[FVWM_MASTER_PIXWIDTH]p keep
++ I All (CurrentPage, !iconic, AcceptsFocus, !State 1, !State 2) \
+    PipeRead 'echo ResizeMove frame \
+    $(( $[vp.width] - $[FVWM_MASTER_PIXWIDTH] ))p keep $[FVWM_MASTER_PIXWIDTH]p keep'
+
+SetEnv Fvwm_CurrentPage $[desk.n]-$[page.nx]-$[page.ny]
+
+### Nicely fit sticky windows into current page when in tiling mode
+DestroyFunc FixSticky
+AddToFunc FixSticky
++ I SetEnv Fvwm_PrevPage $[Fvwm_CurrentPage]
++ I SetEnv Fvwm_CurrentPage $[desk.n]-$[page.nx]-$[page.ny]
++ I All (sticky, !iconic, !State 2) SetEnv Fvwm_SavePage_$[Fvwm_PrevPage]
++ I TestRc (Match) KeepRc None (sticky, !iconic, state 1) \
+    KeepRc Next (CurrentPage, state 1) Schedule 5 FlipFocus
++ I TestRc (Match) KeepRc Next (sticky, !iconic, !State 2, State 1) Schedule 5 FlipFocus
++ I TestRc (Match) Schedule 10 NewWindow
++ I TestRc (Match) UnsetEnv Fvwm_SavePage_$[Fvwm_CurrentPage]
++ I TestRc (Match) Break 1
++ I Test (EnvIsSet Fvwm_SavePage_$[Fvwm_CurrentPage]) Schedule 10 DestroyWindow
++ I UnsetEnv Fvwm_SavePage_$[Fvwm_CurrentPage]
+
+#--------- Toggle floating for individual windows {{{3
+
+### Toggles tiling/floating for current window
+DestroyFunc WindowToggleTiling
+AddToFunc WindowToggleTiling 
++ I Test (!EnvMatch FVWM_TILING_$[desk.n]-$[page.nx]-$[page.ny] 1) Break 1
++ I Current State 2 Toggle
++ I Current (State 2) Piperead 'echo Move 50-50w 50-50w+$(( $[FVWM_TB_HEIGHT] / 2 ))p'
++ I TestRC (Match) Raise
++ I TestRC (Match) WarpToWindow 50 50
++ I PostToggleTiling
+
+### Move window and set to floating mode
+DestroyFunc Move-and-SetFloating
+AddToFunc Move-and-SetFloating
++ I Move
++ I Test (!EnvMatch FVWM_TILING_$[desk.n]-$[page.nx]-$[page.ny] 1) Break 1
++ I Current State 2 True
++ I PostToggleTiling
+
+### Resize window and set to floating mode
+DestroyFunc Resize-and-SetFloating
+AddToFunc Resize-and-SetFloating
++ I Resize Direction SE warptoborder
++ I Test (!EnvMatch FVWM_TILING_$[desk.n]-$[page.nx]-$[page.ny] 1) Break 1
++ I Current State 2 True
++ I PostToggleTiling
+
+### Maximize window and set to floating/tiling mode
+DestroyFunc Maximize-and-SetFloating
+AddToFunc Maximize-and-SetFloating
++ I Maximize $0 $1
++ I Test (!EnvMatch FVWM_TILING_$[desk.n]-$[page.nx]-$[page.ny] 1) Break 1
+#---Use 1st line to push window into tiling mode when unmaximizing,
+#   use 2nd line to leave it floating (when needed, use CM+Space)  ---
+#+ I Current (!Maximized) State 2 False
++ I Current (!Maximized) Break 1
+#---------------------------------------------------------------------
++ I Current (Maximized) State 2 True
++ I PostToggleTiling
++ I Current Raise
+
+### Rearrange remaining windows when in tiling mode
+DestroyFunc PostToggleTiling
+AddToFunc PostToggleTiling
++ I Current (State 2) State 1 False
++ I TestRC (Match) DestroyWindow
+#+ I TestRC (Match) WindowStyle Title
+#+ I Current (!State 2) WindowStyle !Title
++ I Current (!State 2) NewWindow 
+# TODO: Mark floating window in IconMan
+
+#--------- New Windows / Toggle Tiling / WMIArrange {{{3
+
+### Executed when new window enters tiling mode
+DestroyFunc NewWindow
+AddToFunc NewWindow
++ I Test (!EnvMatch FVWM_TILING_$[desk.n]-$[page.nx]-$[page.ny] 1) Break 1
++ I Current (State 2|Transient) NoWindow Break 1
+#---Comment the next 2 lines for new windows to start in slave area---
++ I Current (CurrentPage, !State 2, !iconic, AcceptsFocus) \
+    KeepRc All (CurrentPage, State 1) State 1 false
++ I TestRc (Match) Current State 1 true
+#---------------------------------------------------------------------
++ I None (CurrentPage, State 1) Prev (CurrentPage, !State 2, !iconic, AcceptsFocus) \
+    State 1 True 
++ I WMIArrange
++ I Next (FvwmButtons, !HasPointer) Next (CurrentPage, State 1) WarpToWindow -5 5
+#+ I Next (CurrentPage, State 1) Schedule 120 $[w.id] FlipFocus
+
+### Executed when window leaves tiling mode
+DestroyFunc DestroyWindow
+AddToFunc DestroyWindow
++ I Test (!EnvMatch FVWM_TILING_$[desk.n]-$[page.nx]-$[page.ny] 1) Break
++ I All (iconic) State 1 False
++ I None (CurrentPage, State 1) Current (CurrentPage, !State 2, !iconic, AcceptsFocus) \
+    State 1 True 
++ I None (CurrentPage, State 1) Prev (CurrentPage, !State 2, !iconic, AcceptsFocus) \
+    State 1 True 
++ I WMIArrange
+
+### Toggle tiling mode for current workspace
+DestroyFunc ToggleTiling
+AddToFunc ToggleTiling
++ I Test (EnvMatch FVWM_TILING_$[desk.n]-$[page.nx]-$[page.ny] 1) \
+    SetEnv FVWM_TILING_$[desk.n]-$[page.nx]-$[page.ny] 0
++ I TestRc (Match) All (CurrentPage) State 1 False
++ I TestRc (Match) SendToModule FvwmButtons ChangeButton Layout Icon floating18.png
+#+ I TestRc (Match) KeepRc All (CurrentPage, AcceptsFocus) WindowStyle Title
++ I TestRc (Match) Break
++ I SetEnv FVWM_TILING_$[desk.n]-$[page.nx]-$[page.ny] 1
++ I All (CurrentPage) State 1 False
+#+ I All (CurrentPage, AcceptsFocus) WindowStyle !Title
+#+ I UpdateStyles
++ I Current (State 2|Transient) Prev Focus
++ I Current State 1 True
++ I WMIArrange
++ I SendToModule FvwmButtons ChangeButton Layout Icon tile18.png
+
+
+PipeRead 'echo SetEnv vp.width_1 $(( $[vp.width] - 1 ))'
+PipeRead 'echo SetEnv vp.height_1 $(( $[vp.height] - 1 ))'
+
+### Does the rearranging when in tiling mode
+DestroyFunc WMIArrange
+AddToFunc WMIArrange
++ I Next (CurrentPage, State 1) \
+    ResizeMove frame $[FVWM_MASTER_PIXWIDTH]p -$[FVWM_TB_HEIGHT]p \
+    0 $[FVWM_TB_HEIGHT]p
++ I None (CurrentPage, !State 1, !State 2, !iconic, AcceptsFocus) \
+    Next (CurrentPage, State 1) \
+    ResizeMove frame 100 -$[FVWM_TB_HEIGHT]p 0 $[FVWM_TB_HEIGHT]p
++ I All (CurrentPage, State 1) WindowStyle WindowListSkip
++ I All (CurrentPage, State 2) WindowStyle WindowListSkip
++ I UpdateStyles
++ I ModuleSynchronous FvwmRearrange -tile -u -m -s -r -h -noraise \
+    $[FVWM_MASTER_PIXWIDTH]p $[FVWM_TB_HEIGHT]p $[vp.width_1]p $[vp.height_1]p
++ I All (CurrentPage, State 1) WindowStyle WindowListHit
++ I All (CurrentPage, State 2) WindowStyle WindowListHit
++ I All (FvwmButtons|FvwmPager) WindowStyle WindowListSkip
+
+### Does the rearranging when in horizontal tiling mode
+DestroyFunc WMIArrangeH
+AddToFunc WMIArrangeH
++ I Next (CurrentPage, State 1) \
+    PipeRead 'echo ResizeMove frame 100 $(( $[FVWM_MASTER_PIXWIDTH] - $[FVWM_TB_HEIGHT] ))p \
+    0 $[FVWM_TB_HEIGHT]p'
++ I None (CurrentPage, !State 1, !State 2, !iconic, AcceptsFocus) \
+    Next (CurrentPage, State 1) \
+    ResizeMove frame 100 -$[FVWM_TB_HEIGHT]p 0 $[FVWM_TB_HEIGHT]p
++ I All (CurrentPage, State 1) WindowStyle WindowListSkip
++ I All (CurrentPage, State 2) WindowStyle WindowListSkip
++ I UpdateStyles
++ I ModuleSynchronous FvwmRearrange -tile -u -m -s -r -noraise \
+    0 $[FVWM_MASTER_PIXWIDTH]p $[vp.width_1]p $[vp.height_1]p
++ I All (CurrentPage, State 1) WindowStyle WindowListHit
++ I All (CurrentPage, State 2) WindowStyle WindowListHit
++ I All (FvwmButtons|FvwmPager) WindowStyle WindowListSkip
+
+#--------- SetCurrentMaster / SwapWindows {{{3
+
+### Set the current window to master
+DestroyFunc SetCurrentMaster
+AddToFunc SetCurrentMaster
++ I Test (!EnvMatch FVWM_TILING_$[desk.n]-$[page.nx]-$[page.ny] 1) Break
++ I Current (State 2|Transient) NoWindow Break
++ I Current SetEnv FvwmId_current $$$$[w.id]
++ I Next (CurrentPage, State 1) SetEnv FvwmId_dest $$$$[w.id]
++ I SwapWindowsToggleState
++ I SwapWindows
+
+### Swap window with next window in specified direction
+DestroyFunc SwapWindowsDir
+AddToFunc SwapWindowsDir
++ I Current (State 2|Transient) NoWindow Break
++ I Current SetEnv FvwmId_current $$$$[w.id]
++ I ScanForWindow $0 $1 (CurrentPage, !Iconic, AcceptsFocus, !State 2) \
+    SetEnv FvwmId_dest $$$$[w.id]
++ I SwapWindowsToggleState
++ I SwapWindows
+
+### Toggles master/floating when swapping windows
+DestroyFunc SwapWindowsToggleState
+AddToFunc SwapWindowsToggleState
++ I Piperead '[ $[FvwmId_current] = $[FvwmId_dest] ] && echo Break 1'
++ I WindowId $[FvwmId_current] ThisWindow (state 1) \
+    WindowId $[FvwmId_dest] State 1 True
++ I WindowId $[FvwmId_current] ThisWindow (state 1) \
+    WindowId $[FvwmId_current] State 1 False
++ I TestRc (Match) Break 1
++ I WindowId $[FvwmId_dest] ThisWindow (state 1) \
+    WindowId $[FvwmId_current] State 1 True
++ I WindowId $[FvwmId_dest] ThisWindow (state 1) \
+    WindowId $[FvwmId_dest] State 1 False
+
+### Does the actually swapping
+DestroyFunc SwapWindows
+AddToFunc SwapWindows
++ I WindowId $[FvwmId_current] \
+    SetEnv FvwmCoord_current \
+    '$$$$[w.width]p $$$$[w.height]p $$$$[w.x]p $$$$[w.y]p'
++ I WindowId $[FvwmId_dest] \
+    SetEnv FvwmCoord_dest \
+    '$$$$[w.width]p $$$$[w.height]p $$$$[w.x]p $$$$[w.y]p'
++ I WindowId $[FvwmId_current] ResizeMove frame $[FvwmCoord_dest]
++ I WindowId $[FvwmId_dest] ResizeMove frame $[FvwmCoord_current]
++ I WindowId $[FvwmId_current] WarpToWindow 50 50
++ I UnsetEnv FvwmId_current
++ I UnsetEnv FvwmCoord_current
++ I UnsetEnv FvwmId_dest
++ I UnsetEnv FvwmCoord_dest
+
+#--------- Increase/Decrease MasterWidth {{{3
+
+### Increases width of master area
+DestroyFunc IncreaseMasterWidth
+AddToFunc IncreaseMasterWidth
++ I Test (!EnvMatch FVWM_TILING_$[desk.n]-$[page.nx]-$[page.ny] 1) Break
++ I Test (EnvMatch FVWM_MASTER_WIDTH 80) Break
++ I None (CurrentPage, !State 1, !State 2, !iconic, AcceptsFocus) Break
++ I PipeRead 'echo SetEnv FVWM_MASTER_WIDTH $(( $[FVWM_MASTER_WIDTH] + 5 ))'
++ I Piperead 'echo SetEnv FVWM_MASTER_PIXWIDTH $(( $[FVWM_MASTER_WIDTH]*$[vp.width]/100 ))'
++ I All (CurrentPage, !iconic, AcceptsFocus, State 1) \
+    Resize frame $[FVWM_MASTER_PIXWIDTH]p keep
++ I All (CurrentPage, !iconic, AcceptsFocus, !State 1, !State 2) \
+    PipeRead 'echo ResizeMove frame \
+    $(( $[vp.width] - $[FVWM_MASTER_PIXWIDTH] ))p keep $[FVWM_MASTER_PIXWIDTH]p keep'
+
+### Decreases width of master area
+DestroyFunc DecreaseMasterWidth
+AddToFunc DecreaseMasterWidth
++ I Test (!EnvMatch FVWM_TILING_$[desk.n]-$[page.nx]-$[page.ny] 1) Break
++ I Test (EnvMatch FVWM_MASTER_WIDTH 20) Break
++ I None (CurrentPage, !State 1, !State 2, !iconic, AcceptsFocus) Break
++ I PipeRead 'echo SetEnv FVWM_MASTER_WIDTH $(( $[FVWM_MASTER_WIDTH] - 5 ))'
++ I Piperead 'echo SetEnv FVWM_MASTER_PIXWIDTH $(( $[FVWM_MASTER_WIDTH]*$[vp.width]/100 ))'
++ I All (CurrentPage, !iconic, AcceptsFocus, State 1) \
+    Resize frame $[FVWM_MASTER_PIXWIDTH]p keep
++ I All (CurrentPage, !iconic, AcceptsFocus, !State 1, !State 2) \
+    PipeRead 'echo ResizeMove frame \
+    $(( $[vp.width] - $[FVWM_MASTER_PIXWIDTH] ))p keep $[FVWM_MASTER_PIXWIDTH]p keep'
+
+#
+#          Modules {{{1
+#
+
+#----- Buttons {{{2
+
+DestroyModuleConfig FvwmButtons: *
+*FvwmButtons: Colorset 8
+#*FvwmButtons: Font "xft:Bitstream Vera Sans:style=Roman:size=7"
+*FvwmButtons: Font "xft:sans:pixelsize=11"
+*FvwmButtons: Columns $[vp.width]
+*FvwmButtons: Rows 1
+*FvwmButtons: Frame 0
+*FvwmButtons: Padding 2 2
+#*FvwmButtons: BoxSize smart
+
+
+SetEnv text.width 85
+PipeRead 'echo SetEnv pager.width $(( $[desk.pagesx]*$[vp.width]*$[FVWM_TB_HEIGHT]/$[vp.height] ))'
+PipeRead 'echo SetEnv stalon.width $(( 4*$[FVWM_TB_HEIGHT] ))'
+PipeRead 'echo SetEnv iconman.width $(( $[vp.width] - $[pager.width] - $[stalon.width] - $[FVWM_TB_HEIGHT] - $[text.width] ))'
+*FvwmButtons: ($[pager.width]x1, Swallow (SwallowNew) FvwmPager 'FvwmPager *')
+*FvwmButtons: ($[iconman.width]x1, Swallow (SwallowNew) FvwmIconMan 'FvwmIconMan') 
+*FvwmButtons: ($[stalon.width]x1, Swallow (Kill, UseOld) `stalonetray` `Exec \
+              stalonetray --no-shrink --icon-gravity NE -p`)
+#*FvwmButtons: (72x1, Swallow (Kill, UseOld) `stalonetray` `Exec \
+#              stalonetray --no-shrink -geometry 72x$[FVWM_TB_HEIGHT] --icon-gravity NE -p`)
+*FvwmButtons: ($[text.width]x1, Id Textfield, Title (Right) "Loading... ")
+*FvwmButtons: ($[FVWM_TB_HEIGHT]x1, Id Layout, Icon tile18.png, Padding 0 0, \
+              Action ToggleTiling)
+
+#----- Pager {{{2
+
+DestroyModuleConfig FvwmPager: *
+*FvwmPager: Columns 1
+*FvwmPager: UseSkipList
+*FvwmPager: Font none
+*FvwmPager: WindowLabelFormat "%i"
+*FvwmPager: MoveThreshold 5
+# --- Appearance ---
+*FvwmPager: SolidSeparators
+*FvwmPager: WindowBorderWidth 1
+# --- Colorsets ---
+*FvwmPager: Colorset * 8
+*FvwmPager: HilightColorset * 9
+*FvwmPager: WindowColorsets 8 9
+*FvwmPager: BalloonColorset * 10
+# --- Balloons ---
+*FvwmPager: Balloons All
+*FvwmPager: BalloonFont "xft:Bitstream Vera Sans:style=Roman:size=7"
+*FvwmPager: BalloonYOffset +2
+*FvwmPager: BalloonBorderWidth 1
+
+#----- Icon Manager {{{2
+
+DestroyModuleConfig FvwmIconMan: *
+
+*FvwmIconMan: Resolution Page
+*FvwmIconMan: UseWinList True
+*FvwmIconMan: ShowNoIcons False
+*FvwmIconMan: ShowTransient False
+*FvwmIconMan: DrawIcons Always
+*FvwmIconMan: Sort Name
+*FvwmIconMan: FollowFocus False
+*FvwmIconMan: Format "%i"
+*FvwmIconMan: Title ""
+*FvwmIconMan: ButtonGeometry 1x$[FVWM_TB_HEIGHT]
+*FvwmIconMan: ManagerGeometry 1x1
+*FvwmIconMan: MaxButtonWidthByColumns 1
+# --- Buttons ---
+*FvwmIconMan: Font "xft:sans:pixelsize=11"
+*FvwmIconMan: ReliefThickness 0
+*FvwmIconMan: Colorset 8
+*FvwmIconMan: FocusColorset 9
+*FvwmIconMan: FocusAndSelectColorset 9
+# --- Tips ---
+*FvwmIconMan: Tips needed
+*FvwmIconMan: TipsFormat "%i"
+*FvwmIconMan: TipsDelays 500 200
+*FvwmIconMan: TipsFont "xft:Verdana:pixelsize=11"
+*FvwmIconMan: TipsBorderWidth 1
+*FvwmIconMan: TipsColorset 10
+*FvwmIconMan: TipsJustification leftup
+# --- Actions ---
+# disable default binding of "Iconify":
+*FvwmIconMan: Action Mouse 0 N sendcommand Nop
+*FvwmIconMan: Action Mouse 1 N SendCommand WindowListFunc
+*FvwmIconMan: Action Mouse 2 N SendCommand Iconify
+*FvwmIconMan: Action Mouse 2 M SendCommand Close
+*FvwmIconMan: Action Mouse 3 N SendCommand \
+              "Popup Window-Ops Rectangle +$left+$top 0 +$[FVWM_TB_HEIGHT]p" 
+
+#----- Other Modules {{{2
+
+DestroyModuleConfig FvwmAnimate: *
+*FvwmAnimate: Effect Flip
+*FvwmAnimate: Delay 0
+*FvwmAnimate: Iterations 60
+*FvwmAnimate: Width 2
+
+DestroyModuleConfig FvwmIdent: *
+*FvwmIdent: Colorset 10
+*FvwmIdent: Font "xft:Tahoma:pixelsize=12:Bold"
+
+# vim: set fdm=marker ff=unix:

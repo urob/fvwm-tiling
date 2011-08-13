@@ -1,99 +1,102 @@
-                    README
-                   --------
-                   This configuration implements a simple yet powerful
-                   tiling functionality to fvwm. One can switch between
-                   tiling and classical floating mode on a per screen basis.
-                   Additionally, when in tiling mode individual windows can
-                   be set to floating (either using key mappings or by default
-                   via the configuration file).
+------------------------------------------------------------------------
 
-                   Some of the functions used by this configuration are based
-                   on various other configurations which I unfortunately have
-                   not documented and therefore can not give credit for.
+  BEST OF BOTH WORLDS - A TILING WINDOW MANAGER CONFIGURATION FOR FVWM
 
-   Current Issues: When MasterWidth is set to 20, 40, 45, 65 or 70
-                   Master and Slave area overlap by one pixel after 
-                   calling WMIArrange. Probably this is caused by 
-                   Resize rounding up, while FVWMRearrange is rounding
-                   down. Fix by using Piperead to do the rounding, and
-                   passing arguments in pixels? Or:
 
-                   Globally define Masterwidth in pixel
-                   (compute it once from percentage of screen), and pass
-                   arguments to all functions in pixels. In Increase/
-                   DecreaseMasterWidth function, we can then use "w-XXXp"
+------------------------------------------------------------------------
 
-                   The configuration of the menus is rather depreciated 
-                   (I rarely use them).
+This configuration implements some basic tiling functions to fvwm.
+Otherwise the configuration is aimed at being simple and clean. 
 
-      States used: State 0: Toggles EdgeScroll (true if EdgeThickness 0)
-                            (FvwmButtons only)
-                   State 1: true if window is master
-                   State 2: true if window is floating
-                   State 3: toggles Title/!Title (true if !Title)
+The setup allows to switch between tiling and classical floating mode on
+a per page basis. Additionally, when in tiling mode individual windows
+can be set to floating (either using keyboard shortcuts or configuring
+them to always be floating). 
 
-     Requirements: The use of 'urxvt' is hardcoded as the default shell. Sorry!
-                   Either install or better change code (using a variable).
-                   Further the background-console relies on 'screen'.
-                   Finally, 'stalonetray' is used as pager and 'dmenu_path' is used
-                   for the program launcher. Install or adjust. (A recompiled-version
-                   of dmenu to match the taskbar-size is included, you may have to 
-                   compile yourself if running on another platform.)
 
-    Customization: The behavior of the background console is configured in the 
-                   file screenrc.alpine (no need to actually start alpine there).
+    Current Issues
+    --------------
 
-                   There are a number of themes to chose from in the theme folder
-                   (e16 is the default).
+The configuration of the menus is completely depreciated (I rarely use
+them) and probably of no use to anybody.
 
-                   By default I use a 2x2x1 desktop configuration. I.e., I have 2
-                   desktops a 2x1 screens. By default only the left screen of 
-                   desktop 0 (the default desktop) starts in tiling mode.
+    States used
+    -----------
+State 0: Toggles EdgeScroll (true if EdgeThickness 0), only applies to
+         FvwmButtons
+State 1: true if window is master
+State 2: true if window is floating
+State 3: toggles Title/!Title (true if !Title)
 
-                   Most of the customization is done in this file. Just read through it.
-                   If you use vim, the folding should make it rather organized and easy
-                   to read.
+    Requirements
+    ------------
 
-      Keybindings: Tiling-Related:
-                     Alt+Space:       Switch current screen between floating/tiling mode
-                                      (can also be done using the indicator-button in the
-                                      right upper corner of the button bar).
-                     Alt+Shift+Space: Switch current window between floating/tiling 
-                                      (only works when in tiling mode)
-                     Ctrl+Alt+Enter:  Make current window master
-                     Alt+L:           Increase master area
-                     Alt+H:           Decrease master area
+The use of 'urxvt' is hardcoded as the default shell. Sorry! Either
+install or better change code (using a variable). Further the background
+console relies on 'screen'. Finally, 'stalonetray' is used as tray and
+'dmenu_path' is used for the program launcher. Install or adjust. (A
+recompiled-version of dmenu to match the taskbar-size is included, you
+may have to compile yourself if running on another platform.)
 
-                    Selecting windows:
-                     Alt+K:           Select next window clockwise
-                     Alt+J:           Select next window counterclockwise
-                     Alt+Ctrl+K:      Move current window clockwise
-                     Alt+Ctrl+J:      Move current window counterclockwise
-                     Alt+Tab:         Cycle through comple window list (including minimized
-                                      and other screens)
+    Customization
+    -------------
+The behavior of the background console is configured in the file
+screenrc.bgc.
 
-                    Navigating workspaces:
-                     Alt-Right:       Go to right screen (alternative binding: Alt+])
-                     Alt-Left:        Go to left screen (alternative binding: Alt+[)
-                     Alt-Ctrl-Right:  Go to right screen and take focused windows with you
-                     Alt-Ctrl-Left:   Go to left screen and take focused windows with you
-                     Alt-Down:        Go to next (secondary) desktop
-                     Alt-Up:          Go to previous (primary) desktop
-                     Alt-Escape:      Go to last screen
+There are a number of color themes to chose from in the theme folder,
+which can be easily switched in the configuration file.
 
-                    Window operations:
-                     Alt+M:           Maximize and set floating
-                     Alt+T:           Titlebar on/off
-                     Alt+S:           Toggle Sticky
-                     Alt+X:           Minimize (retrieve using the taskbar or alt+tab)
-                     Alt+Shift+C:     Close (alternative shortcut Alt+F4)
-                     Alt+LeftClick:   Move window and set to floating
-                     Alt+RightClick:  Resize window and set to floating
+By default I use a 2x2x1 desktop configuration. I.e., I have 2 desks a
+2x1 pages. By default only the left page of desk 0 (the default desk)
+starts in tiling mode (can be changed via an environmental variable).
 
-                    Other:
-                     Alt+P:           Execute command
-                     Alt+Grave:       Toggle Background console
-                     Middle-Click root window/titlebar: Toggle Edgescrolling
+Almost all of the customization is done in the main configuration file.
+Just read through it. If you use vim, the folding should make it rather
+organized and easy to read.
 
-                    Applications:
-                     customize in the keybinding section
+    Keybindings
+    -----------
+
+Tiling-Related:
+ Alt+Space:       Switch current page between floating/tiling mode
+                  (can also be done using the indicator-button in the
+                  right upper corner of the button bar).
+ Alt+Shift+Space: Switch current window between floating/tiling 
+                  (only works when in tiling mode)
+ Ctrl+Alt+Enter:  Make current window master
+ Alt+L:           Increase master area
+ Alt+H:           Decrease master area
+
+Selecting windows:
+ Alt+K:           Select next window clockwise
+ Alt+J:           Select next window counterclockwise
+ Alt+Ctrl+K:      Move current window clockwise
+ Alt+Ctrl+J:      Move current window counterclockwise
+ Alt+Tab:         Cycle through comple window list (including minimized
+                  and other page)
+
+Navigating workspaces:
+ Alt-Right:       Go to right page (alternative binding: Alt+])
+ Alt-Left:        Go to left page (alternative binding: Alt+[)
+ Alt-Ctrl-Right:  Go to right page and take focused windows with you
+ Alt-Ctrl-Left:   Go to left page and take focused windows with you
+ Alt-Down:        Go to next (secondary) desk
+ Alt-Up:          Go to previous (primary) desk
+ Alt-Escape:      Go to last page
+
+Window operations:
+ Alt+M:           Maximize and set floating
+ Alt+T:           Titlebar on/off
+ Alt+S:           Toggle Sticky
+ Alt+X:           Minimize (retrieve using the taskbar or alt+tab)
+ Alt+Shift+C:     Close (alternative shortcut Alt+F4)
+ Alt+LeftClick:   Move window and set to floating
+ Alt+RightClick:  Resize window and set to floating
+
+Other:
+ Alt+P:           Execute command
+ Alt+Grave:       Toggle Background console
+ Middle-Click root window/titlebar: Toggle Edgescrolling
+
+Applications:
+ Customize in the keybinding section of the configuration file

@@ -1,0 +1,34 @@
+# ------------------------------------------------------------------------------
+# SCREEN SETTINGS FOR BACKGROUND CONSOLE
+# ------------------------------------------------------------------------------
+
+startup_message off
+deflogin on
+vbell on
+vbell_msg "   Wuff  ----  Wuff!!  "
+defscrollback 10000
+altscreen on
+
+bind ^k
+bind ^\
+bind s caption always
+bind S caption splitonly
+
+#shelltitle ' |bash'         # changes dynamically via .bashrc
+hardstatus off              # use caption line for screen messages
+hardstatus lastline "%h"    # use hardstatus defined by .bashrc
+caption always "%?%F%{= lk}%:%{=u dr}%? %H%=< %-Lw%{= rk}%50>%n%f %t%{-}%+Lw > %{= dd}%<"
+
+termcapinfo vt100 dl=5\E[M
+termcapinfo xterm*|rxvt*|kterm*|Eterm* hs:ts=\E]0;:fs=\007:ds=\E]0;\007
+termcapinfo xterm 'is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l'
+termcapinfo xterm*|linux*|rxvt*|Eterm* OP
+termcapinfo xterm|xterms|xs|rxvt ti@:te@
+defnonblock 5
+
+# ------------------------------------------------------------------------------
+# STARTUP SCREENS
+# ------------------------------------------------------------------------------
+
+#screen -t mail 0 alpine
+
