@@ -78,10 +78,10 @@ Tiling-Related:
  Alt+H:           Decrease master area
 
 Selecting windows:
- Alt+K:           Select next window clockwise
- Alt+J:           Select next window counterclockwise
- Alt+Ctrl+K:      Move current window clockwise
- Alt+Ctrl+J:      Move current window counterclockwise
+ Alt+J:           Select next window clockwise
+ Alt+K:           Select next window counterclockwise
+ Alt+Ctrl+J:      Move current window clockwise
+ Alt+Ctrl+K:      Move current window counterclockwise
  Alt+Tab:         Cycle through complete window list (including minimized and
                   windows on other pages)
 

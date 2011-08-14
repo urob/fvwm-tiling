@@ -5,7 +5,7 @@
 #          Created: Mar 10 2009, 22:13:18
 #
 #      Description: Best of both worlds - A tiling-wm configuration for fvwm
-#      Last Change: Aug 14 2011, 00:04:43
+#      Last Change: Aug 14 2011, 15:13:40
 #
 #------------------------------------------------------------------------------
 #
@@ -31,16 +31,16 @@
 #                                      (can also be done using the indicator-button in the
 #                                      right upper corner of the button bar).
 #                     Alt+Shift+Space: Switch current window between floating/tiling 
-#                                      (only works when in tiling mode)
+#                                      (only applies when in tiling mode)
 #                     Ctrl+Alt+Enter:  Make current window master
 #                     Alt+L:           Increase master area
 #                     Alt+H:           Decrease master area
 #
 #                    Selecting windows:
-#                     Alt+K:           Select next window clockwise
-#                     Alt+J:           Select next window counterclockwise
-#                     Alt+Ctrl+K:      Move current window clockwise
-#                     Alt+Ctrl+J:      Move current window counterclockwise
+#                     Alt+J:           Select next window clockwise
+#                     Alt+K:           Select next window counterclockwise
+#                     Alt+Ctrl+J:      Move current window clockwise
+#                     Alt+Ctrl+K:      Move current window counterclockwise
 #                     Alt+Tab:         Cycle through comple window list (including minimized
 #                                      and other pages)
 #
@@ -54,21 +54,21 @@
 #                     Alt-Escape:      Go to last page
 #
 #                    Window operations:
-#                     Alt+M:           Maximize and set floating
+#                     Alt+M:           Maximize window and set to floating
 #                     Alt+T:           Titlebar on/off
 #                     Alt+S:           Toggle Sticky
-#                     Alt+X:           Minimize (retrieve using the taskbar or alt+tab)
+#                     Alt+X:           Minimize (retrieve using the taskbar or Alt+Tab)
 #                     Alt+Shift+C:     Close (alternative shortcut Alt+F4)
 #                     Alt+LeftClick:   Move window and set to floating
 #                     Alt+RightClick:  Resize window and set to floating
 #
 #                    Other:
-#                     Alt+P:           Execute command
+#                     Alt+P:           Execute command (launches dmenu)
 #                     Alt+Grave:       Toggle Background console
 #                     Middle-Click root window/titlebar: Toggle Edgescrolling
 #
 #                    Applications:
-#                     customize in the keybinding section
+#                     Various, customize in the keybinding section
 #
 #   For more information see the README file.
 #
