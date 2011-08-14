@@ -24,11 +24,17 @@ them) and probably of no use to anybody.
 
     States used
     -----------
+
 State 0: Toggles EdgeScroll (true if EdgeThickness 0), only applies to
          FvwmButtons
 State 1: true if window is master
 State 2: true if window is floating
 State 3: toggles Title/!Title (true if !Title)
+
+E.g., to configure mplayer to always be floating just add 'Style "MPlayer"
+State 2' to the configuration. (To set a window to be floating on the fly just
+use the keyboard shortcut, see below.) Otherwise the states are handled
+automatically in the background by the functions of this configuration.
 
     Requirements
     ------------
@@ -42,15 +48,17 @@ may have to compile yourself if running on another platform.)
 
     Customization
     -------------
-The behavior of the background console is configured in the file
-screenrc.bgc.
+
+By default I use a 2x2x1 desktop configuration. I.e., I have 2 desks a 2x1
+pages. By default only the left page of desk 0 (the default desk) starts in
+tiling mode (can be toggled on the fly or changed permanently in the
+configuration).
 
 There are a number of color themes to chose from in the theme folder,
 which can be easily switched in the configuration file.
 
-By default I use a 2x2x1 desktop configuration. I.e., I have 2 desks a
-2x1 pages. By default only the left page of desk 0 (the default desk)
-starts in tiling mode (can be changed via an environmental variable).
+The background console launches a screen session which reads the configuration
+file screenrc.bgc.
 
 Almost all of the customization is done in the main configuration file.
 Just read through it. If you use vim, the folding should make it rather
@@ -64,7 +72,7 @@ Tiling-Related:
                   (can also be done using the indicator-button in the
                   right upper corner of the button bar).
  Alt+Shift+Space: Switch current window between floating/tiling 
-                  (only works when in tiling mode)
+                  (only applies when in tiling mode)
  Ctrl+Alt+Enter:  Make current window master
  Alt+L:           Increase master area
  Alt+H:           Decrease master area
@@ -74,8 +82,8 @@ Selecting windows:
  Alt+J:           Select next window counterclockwise
  Alt+Ctrl+K:      Move current window clockwise
  Alt+Ctrl+J:      Move current window counterclockwise
- Alt+Tab:         Cycle through comple window list (including minimized
-                  and other page)
+ Alt+Tab:         Cycle through complete window list (including minimized and
+                  windows on other pages)
 
 Navigating workspaces:
  Alt-Right:       Go to right page (alternative binding: Alt+])
@@ -87,18 +95,18 @@ Navigating workspaces:
  Alt-Escape:      Go to last page
 
 Window operations:
- Alt+M:           Maximize and set floating
+ Alt+M:           Maximize window and set to floating
  Alt+T:           Titlebar on/off
  Alt+S:           Toggle Sticky
- Alt+X:           Minimize (retrieve using the taskbar or alt+tab)
+ Alt+X:           Minimize (retrieve using the taskbar or Alt+Tab)
  Alt+Shift+C:     Close (alternative shortcut Alt+F4)
  Alt+LeftClick:   Move window and set to floating
  Alt+RightClick:  Resize window and set to floating
 
 Other:
- Alt+P:           Execute command
+ Alt+P:           Execute command (launches dmenu)
  Alt+Grave:       Toggle Background console
  Middle-Click root window/titlebar: Toggle Edgescrolling
 
 Applications:
- Customize in the keybinding section of the configuration file
+ Various, customize in the keybinding section of the configuration file
