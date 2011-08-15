@@ -3,8 +3,8 @@
 #       Author: Robert Ulbricht
 #      Created: Mär 21 2009, 18:32:31 
 # 
-#  Description: windows classic theme for fvwm
-#  Last Change: Mär 21 2009, 19:32:29 
+#  Description: windows classic-like colors for fvwm
+#  Last Change: Aug 15 2011, 11:41:47
 # =============================================================================
 
 Exec exec xsetroot -solid "#3b6ea4"

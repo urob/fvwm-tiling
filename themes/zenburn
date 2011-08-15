@@ -3,8 +3,8 @@
 #       Author: Robert Ulbricht
 #      Created: Mär 21 2009, 18:20:34 
 # 
-#  Description: zenburn theme for fvwm
-#  Last Change: Mär 21 2009, 19:32:56 
+#  Description: zenburn colors for fvwm
+#  Last Change: Aug 15 2011, 11:42:10
 # =============================================================================
 
 Exec exec xsetroot -solid "#545454"

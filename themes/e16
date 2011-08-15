@@ -3,8 +3,8 @@
 #       Author: Robert Ulbricht
 #      Created: Mär 21 2009, 18:20:34 
 # 
-#  Description: e16-like theme for fvwm
-#  Last Change: Mar 22 2009, 02:31:33 
+#  Description: e16-like colors for fvwm
+#  Last Change: Aug 15 2011, 11:41:13
 # =============================================================================
 
 #Exec exec xsetroot -solid "#718671"
